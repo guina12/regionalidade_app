@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplicação de Avaliações</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Avaliações de Locais</h1>
+
+        <form id="pesquisar-form">
+            <input type="text" id="local" placeholder="Nome do local" required>
+            <button type="submit">Pesquisar</button>
+        </form>
+
+        <form id="adicionar-form">
+            <input type="text" id="nome" placeholder="Seu nome" required>
+            <textarea id="comentario" placeholder="Seu comentário" required></textarea>
+            <input type="number" id="avaliacao" placeholder="Avaliação (1-5)" min="1" max="5" required>
+            <input type="text" id="foto" placeholder="URL da foto (opcional)">
+            <input type="hidden" id="latitude">
+            <input type="hidden" id="longitude">
+            <button type="submit">Adicionar Avaliação</button>
+        </form>
+
+        <div id="map" style="height: 500px;"></div>
+    </div>
+
+    <script>
+        var map = L.map('map').setView([-27.5954, -48.5480], 10); // Centro aproximado de SC
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        function addMarker(lat, lon, nome, comentario, avaliacao, foto) {
+            var popupContent = `
+                <b>${nome}</b><br>
+                ${comentario}<br>
+                Avaliação: ${avaliacao} estrelas<br>
+                ${foto ? `<img src="${foto}" alt="Foto" style="width:100px;">` : ''}
+            `;
+            L.marker([lat, lon]).addTo(map)
+                .bindPopup(popupContent);
+        }
+
+        function loadAvaliacoes() {
+            $.get('/avaliacoes', function(data) {
+                data.forEach(function(avaliacao) {
+                    addMarker(avaliacao.latitude, avaliacao.longitude, avaliacao.nome, avaliacao.comentario, avaliacao.avaliacao, avaliacao.foto);
+                });
+            });
+        }
+
+        $(document).ready(function() {
+            loadAvaliacoes();  // Carrega avaliações ao inicializar
+
+            $('#pesquisar-form').on('submit', function(e) {
+                e.preventDefault();
+                var local = $('#local').val();
+                $.post('/pesquisar', { local: local }, function(data) {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        var nome = data.nome;
+                        var latitude = data.latitude;
+                        var longitude = data.longitude;
+                        addMarker(latitude, longitude, nome, '', '', '');
+                        $('#latitude').val(latitude);
+                        $('#longitude').val(longitude);
+                    }
+                });
+            });
+
+            $('#adicionar-form').on('submit', function(e) {
+                e.preventDefault();
+                var latitude = $('#latitude').val();
+                var longitude = $('#longitude').val();
+                var nome = $('#nome').val();
+                var comentario = $('#comentario').val();
+                var avaliacao = $('#avaliacao').val();
+                var foto = $('#foto').val();
+
+                $.post('/adicionar_comentario', { latitude, longitude, nome, comentario, avaliacao, foto }, function(response) {
+                    alert('Comentário adicionado com sucesso!');
+                    addMarker(latitude, longitude, nome, comentario, avaliacao, foto);
+                    $('#adicionar-form')[0].reset();  // Limpa o formulário
+                });
+            });
+        });
+    </script>
+</body>
+</html>
