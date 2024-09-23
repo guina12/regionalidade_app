@@ -16,9 +16,9 @@ Antes de começar, verifique se você tem o seguinte instalado:
 Baixe e instale o MySQL seguindo as instruções fornecidas no site oficial. Durante a instalação, configure a senha do usuário `root` e anote-a, pois será necessária mais tarde.
 
 ### 2. Criar o Banco de Dados
+   ex:pip install mysql-connector
+      pip install pymysql
 
 ### 3. Instalar o FLASK 
   ex:pip install flask
-
-Após a instalação, abra o terminal ou prompt de comando e inicie o MySQL:
 
