@@ -5,7 +5,8 @@
 Antes de começar, verifique se você tem o seguinte instalado:
 
 - [Python 3.10 ou superior](https://www.python.org/downloads/)
-- [MySQL](https://dev.mysql.com/downloads/mysql/)
+- [MySQL-CONNECTOR](https://dev.mysql.com/downloads/mysql/)
+- [FLASK](https://flask.palletsprojects.com/en/3.0.x/)
 - `pip` para gerenciar pacotes Python
 
 ## Passos para Configuração
@@ -16,7 +17,8 @@ Baixe e instale o MySQL seguindo as instruções fornecidas no site oficial. Dur
 
 ### 2. Criar o Banco de Dados
 
+### 3. Instalar o FLASK 
+  ex:pip install flask
+
 Após a instalação, abra o terminal ou prompt de comando e inicie o MySQL:
 
-```bash
-mysql -u root -p
